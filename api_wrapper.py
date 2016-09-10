@@ -1,3 +1,5 @@
+import requests
+
 class Question:
     def __init__(self):
         self.answer_strings = list()
@@ -5,7 +7,7 @@ class Question:
         self.answer_ids = list()
         self.question_text = ""
         self.right_answer = ""
-        
+
 
 class Test:
     def __init__(self, test_id, **credentials):
@@ -15,7 +17,20 @@ class Test:
         self.last_id = 0
         self.questions_left = len(self.questions)
 
-    def validate_answer(self, ):
+    appid = "306"
+    appsgn = "d8629af695839ba5481757a519e57fb1"
+
+    def login(self):
+        query = "http://dev.moyuniver.ru/api/php/v03/api_login.php?login=guest&pass=guest" \
+                "&memberid=&phoneid=&appid=306&appsgn=d8629af695839ba5481757a519e57fb1" \
+                "&appcode=&os=&ver=&width=&height="
+        r = requests.get(query)
+        return r.text
+
+    def construct_query(self, params):
+        pass
+
+    def validate_answer(self, string_index):
         """
 
         :return: {right: bool, right_answer: str, next_button: str}
@@ -36,3 +51,4 @@ class Test:
     def terminate(self):
         pass
 
+t = Test()
