@@ -33,6 +33,7 @@ class Test:
         self.member_id = self.login()
         self.test_id = test_id
         self.question_ids = list()
+        self.answer_history = list()
         # init the test
         query = "http://dev.moyuniver.ru/api/php/v03/api_runevent.php?eid={}&memberid={}&" \
                 "appid={}&appsgn={}&appcode=&os=&ver=&width=&height=".format(
@@ -81,7 +82,7 @@ class Test:
         last_id = self.current_id - 1
         question = self.questions[self.question_ids[last_id]]
         answer_id = question.answer_ids[answer_index]
-
+        self.answer_history.append(answer_id)
         query = query.format(self.session_id, question.question_session_id, self.member_id,
                              question.question_type, question.question_id, answer_id)
 
@@ -124,29 +125,33 @@ class Test:
         self.current_id += 1
         return question
 
-    def advert(self):
-        return "Купи наше приложение, там больше вопросов, БОЛЬШЕ ВОПРОСОВ!"
-
     def terminate(self):
-        pass
+        query = "http://dev.moyuniver.ru/api/php/v03/api_finish.php?tid={}&memberid={}&a={}".format(
+            self.session_id, self.member_id, "-".join(self.answer_history)
+        )
+        r = requests.get(query)
+        assert r.status_code == 200
 
 if __name__ == "__main__":
+    print("Testing")
     t = Test("15692")
     while True:
-        input()
-        q = t.get_next_question()
-        print(str(q))
-        res = t.validate_answer(int(input()))
-        if res['right']:
-            print("Ok")
-        else:
-            print("/\\ox!")
+        try:
+            input()
+            q = t.get_next_question()
+            print(str(q))
+            res = t.validate_answer(int(input()))
+            if res['right']:
+                print("Ok")
+            else:
+                print("/\\ox!")
 
-        print("Answer: " + res['right_answer'])
-        print("Description: " + res['description'])
+            print("Answer: " + res['right_answer'])
+            print("Description: " + res['description'])
 
-        # except Exception as e:
-        #     print(str(e))
-        #     print("Кончились вопросы")
-        #     break
+        except Exception as e:
+            print(str(e))
+            print("Кончились вопросы")
+            t.terminate()
+            break
 
