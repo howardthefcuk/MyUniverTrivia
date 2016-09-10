@@ -1,4 +1,8 @@
-
+class Question:
+    def __init__(self):
+        self.answer_strings = list()
+        self.button_strings = list()
+        self.question_text = ""
 
 class Test:
     def __init__(self, test_id, **credentials):
@@ -7,15 +11,6 @@ class Test:
         self.questions = dict()  # TODO: populate
         self.last_id = 0
         self.questions_left = len(self.questions)
-
-    # def get_question_by_id(self, qid):
-    #     """
-    #
-    #     :param qui:
-    #     :return: {'id': list question + 4 answers}
-    #     """
-    #     self.last_id = qid
-    #     pass
 
     def validate_answer(self):
         """
@@ -30,6 +25,11 @@ class Test:
         :param qui:
         :return: {'id': list question + 4 answers}
         """
-        self.last_id = qid
+        pass
+
+    def advert(self):
+        return "Купи наше приложение, там больше вопросов, БОЛЬШЕ ВОПРОСОВ!"
+
+    def terminate(self):
         pass
 
