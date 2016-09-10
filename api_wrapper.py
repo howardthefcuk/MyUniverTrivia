@@ -56,6 +56,7 @@ class Test:
                 if fields[1] not in self.questions:
                     self.question_ids.append(question_id)
                     self.questions[question_id] = Question()
+                    self.questions[question_id].question_id = question_id
                     self.questions[question_id].question_text = question_text
                     self.questions[question_id].question_session_id = question_session_id
                     self.questions[question_id].question_type = question_type
@@ -73,7 +74,7 @@ class Test:
     def validate_answer(self, answer_index):
         """
 
-        :return: {right: bool, right_answer: str, next_button: str}
+        :return: {right: bool, right_answer: str, description: str}
         """
         query = "http://dev.moyuniver.ru/api/php/v03/api_asheet_mod.php?tid={}&appid=306" \
                 "&appsgn=d8629af695839ba5481757a519e57fb1&tsid={}&memberid={}&qtype={}&qid={}&a={}"
@@ -85,9 +86,32 @@ class Test:
                              question.question_type, question.question_id, answer_id)
 
         r = requests.get(query)
+        assert r.status_code == 200
         right = bool(int(r.text))
-        return right
 
+        query = "http://dev.moyuniver.ru/api/php/v03/api_answer.php?qid={0}&" \
+                "memberid={1}&appid={2}&appsgn={3}&" \
+                "appcode=&os=&ver=&width=&height=".format(
+            question.question_id, self.member_id, self.appid, self.appsgn)
+
+        r = requests.get(query)
+        assert r.status_code == 200
+
+        r.encoding = 'utf-8'
+        res = r.text
+        fields = res.strip().split("#")
+
+        right_answer = fields[1]
+        description = fields[2]
+
+        question.right_answer = right_answer
+
+        data = {
+            'right': right,
+            'right_answer': right_answer,
+            'description': description
+        }
+        return data
 
     def get_next_question(self):
         """
@@ -106,20 +130,23 @@ class Test:
     def terminate(self):
         pass
 
-
-t = Test("15692")
-while True:
-    try:
+if __name__ == "__main__":
+    t = Test("15692")
+    while True:
         input()
         q = t.get_next_question()
         print(str(q))
         res = t.validate_answer(int(input()))
-        if res:
+        if res['right']:
             print("Ok")
         else:
             print("/\\ox!")
 
-    except:
-        print("Кончились вопросы")
-        break
+        print("Answer: " + res['right_answer'])
+        print("Description: " + res['description'])
+
+        # except Exception as e:
+        #     print(str(e))
+        #     print("Кончились вопросы")
+        #     break
 
