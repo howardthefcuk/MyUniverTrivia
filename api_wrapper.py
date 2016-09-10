@@ -3,29 +3,60 @@ import requests
 class Question:
     def __init__(self):
         self.answer_strings = list()
-        self.button_strings = list()
+        # self.button_strings = list()
         self.answer_ids = list()
         self.question_text = ""
         self.right_answer = ""
+        self.question_id = ""
+
+    def __str__(self):
+        strrepr = "Q:{}\nAs:\n-{}\n\n{}".format(self.question_text, "\n-".join(self.answer_strings),
+                                              "\n".join(self.answer_ids))
+        return strrepr
 
 
 class Test:
+    appid = "306"
+    appsgn = "d8629af695839ba5481757a519e57fb1"
+
     def __init__(self, test_id, **credentials):
         self.test_id = test_id
         self.session_id = 0
         self.questions = dict()  # TODO: populate
         self.last_id = 0
         self.questions_left = len(self.questions)
+        self.member_id = self.login()
+        self.test_id = test_id
+        # init the test
+        query = "http://dev.moyuniver.ru/api/php/v03/api_runevent.php?eid={}&memberid={}&" \
+                "appid={}&appsgn={}&appcode=&os=&ver=&width=&height=".format(
+            self.test_id, self.member_id, self.appid, self.appsgn
+        )
+        r = requests.get(query)
+        r.encoding = 'utf-8'
+        assert r.status_code == 200
+        test_text = r.text.strip()
 
-    appid = "306"
-    appsgn = "d8629af695839ba5481757a519e57fb1"
+        for line in test_text.split("\n"):
+            line = line.strip()
+            fields = line.split("#")
+            if fields:
+                question_id = fields[1]
+                question_text = fields[3]
+                answer_text = fields[5]
+                answer_id = fields[4]
+                if fields[1] not in self.questions:
+                    self.questions[question_id] = Question()
+                    self.questions[question_id].question_text = question_text
+                self.questions[question_id].answer_strings.append(answer_text)
+                self.questions[question_id].answer_ids.append(answer_id)
 
     def login(self):
         query = "http://dev.moyuniver.ru/api/php/v03/api_login.php?login=guest&pass=guest" \
                 "&memberid=&phoneid=&appid=306&appsgn=d8629af695839ba5481757a519e57fb1" \
                 "&appcode=&os=&ver=&width=&height="
         r = requests.get(query)
-        return r.text
+        return r.text.split("#")[0]
 
     def construct_query(self, params):
         pass
@@ -51,4 +82,7 @@ class Test:
     def terminate(self):
         pass
 
-t = Test()
+t = Test("15692")
+for q in t.questions:
+    print(str(t.questions[q]))
+    print()
