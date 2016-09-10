@@ -41,7 +41,7 @@ class Test:
         r = requests.get(query)
         r.encoding = 'utf-8'
         assert r.status_code == 200
-        test_text = r.text.strip()
+        test_text = r.text.strip().replace("<br>", " ")
 
         for line in test_text.split("\n"):
             line = line.strip()
@@ -108,7 +108,7 @@ class Test:
 
         data = {
             'right': right,
-            'right_answer': right_answer,
+            'right_answer': right_answer.replace("<br>", " "),
             'description': description
         }
         return data
