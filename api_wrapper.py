@@ -2,7 +2,10 @@ class Question:
     def __init__(self):
         self.answer_strings = list()
         self.button_strings = list()
+        self.answer_ids = list()
         self.question_text = ""
+        self.right_answer = ""
+        
 
 class Test:
     def __init__(self, test_id, **credentials):
@@ -12,7 +15,7 @@ class Test:
         self.last_id = 0
         self.questions_left = len(self.questions)
 
-    def validate_answer(self):
+    def validate_answer(self, ):
         """
 
         :return: {right: bool, right_answer: str, next_button: str}
