@@ -27,6 +27,7 @@ class Test:
         self.questions_left = len(self.questions)
         self.member_id = self.login()
         self.test_id = test_id
+        self.question_ids = list()
         # init the test
         query = "http://dev.moyuniver.ru/api/php/v03/api_runevent.php?eid={}&memberid={}&" \
                 "appid={}&appsgn={}&appcode=&os=&ver=&width=&height=".format(
@@ -46,10 +47,12 @@ class Test:
                 answer_text = fields[5]
                 answer_id = fields[4]
                 if fields[1] not in self.questions:
+                    self.question_ids.append(question_id)
                     self.questions[question_id] = Question()
                     self.questions[question_id].question_text = question_text
                 self.questions[question_id].answer_strings.append(answer_text)
                 self.questions[question_id].answer_ids.append(answer_id)
+        self.session_id = fields[0]
 
     def login(self):
         query = "http://dev.moyuniver.ru/api/php/v03/api_login.php?login=guest&pass=guest" \
@@ -57,9 +60,6 @@ class Test:
                 "&appcode=&os=&ver=&width=&height="
         r = requests.get(query)
         return r.text.split("#")[0]
-
-    def construct_query(self, params):
-        pass
 
     def validate_answer(self, string_index):
         """
@@ -74,7 +74,10 @@ class Test:
         :param qui:
         :return: {'id': list question + 4 answers}
         """
-        pass
+        assert self.last_id < len(self.question_ids)
+        question = self.questions[self.question_ids[self.last_id]]
+        self.last_id += 1
+        return question
 
     def advert(self):
         return "Купи наше приложение, там больше вопросов, БОЛЬШЕ ВОПРОСОВ!"
@@ -82,7 +85,15 @@ class Test:
     def terminate(self):
         pass
 
+
+
 t = Test("15692")
-for q in t.questions:
-    print(str(t.questions[q]))
-    print()
+while True:
+    try:
+        input()
+        q = t.get_next_question()
+        print(str(q))
+    except:
+        print("Кончились вопросы")
+        break
+
