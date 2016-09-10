@@ -1,3 +1,6 @@
+"""
+This class is an object based wrapper for MoyUniver API
+"""
 import requests
 
 class Question:
@@ -8,6 +11,8 @@ class Question:
         self.question_text = ""
         self.right_answer = ""
         self.question_id = ""
+        self.question_type = ""
+        self.question_session_id = ""
 
     def __str__(self):
         strrepr = "Q:{}\nAs:\n-{}\n\n{}".format(self.question_text, "\n-".join(self.answer_strings),
@@ -23,7 +28,7 @@ class Test:
         self.test_id = test_id
         self.session_id = 0
         self.questions = dict()  # TODO: populate
-        self.last_id = 0
+        self.current_id = 0
         self.questions_left = len(self.questions)
         self.member_id = self.login()
         self.test_id = test_id
@@ -42,7 +47,9 @@ class Test:
             line = line.strip()
             fields = line.split("#")
             if fields:
+                question_type = fields[2]
                 question_id = fields[1]
+                question_session_id = fields[6]
                 question_text = fields[3]
                 answer_text = fields[5]
                 answer_id = fields[4]
@@ -50,6 +57,8 @@ class Test:
                     self.question_ids.append(question_id)
                     self.questions[question_id] = Question()
                     self.questions[question_id].question_text = question_text
+                    self.questions[question_id].question_session_id = question_session_id
+                    self.questions[question_id].question_type = question_type
                 self.questions[question_id].answer_strings.append(answer_text)
                 self.questions[question_id].answer_ids.append(answer_id)
         self.session_id = fields[0]
@@ -61,12 +70,24 @@ class Test:
         r = requests.get(query)
         return r.text.split("#")[0]
 
-    def validate_answer(self, string_index):
+    def validate_answer(self, answer_index):
         """
 
         :return: {right: bool, right_answer: str, next_button: str}
         """
-        pass
+        query = "http://dev.moyuniver.ru/api/php/v03/api_asheet_mod.php?tid={}&appid=306" \
+                "&appsgn=d8629af695839ba5481757a519e57fb1&tsid={}&memberid={}&qtype={}&qid={}&a={}"
+        last_id = self.current_id - 1
+        question = self.questions[self.question_ids[last_id]]
+        answer_id = question.answer_ids[answer_index]
+
+        query = query.format(self.session_id, question.question_session_id, self.member_id,
+                             question.question_type, question.question_id, answer_id)
+
+        r = requests.get(query)
+        right = bool(int(r.text))
+        return right
+
 
     def get_next_question(self):
         """
@@ -74,9 +95,9 @@ class Test:
         :param qui:
         :return: {'id': list question + 4 answers}
         """
-        assert self.last_id < len(self.question_ids)
-        question = self.questions[self.question_ids[self.last_id]]
-        self.last_id += 1
+        assert self.current_id < len(self.question_ids)
+        question = self.questions[self.question_ids[self.current_id]]
+        self.current_id += 1
         return question
 
     def advert(self):
@@ -86,13 +107,18 @@ class Test:
         pass
 
 
-
 t = Test("15692")
 while True:
     try:
         input()
         q = t.get_next_question()
         print(str(q))
+        res = t.validate_answer(int(input()))
+        if res:
+            print("Ok")
+        else:
+            print("/\\ox!")
+
     except:
         print("Кончились вопросы")
         break
