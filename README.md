@@ -9,4 +9,4 @@ Five Lakes:
 - Oleg Zebnitskiy
 
 Event Website:
-https://geekbrains.ru/geekday?utm_source=it-sobytie&utm_medium=affiliate&utm_campaign=it-sobytie_21.06.16
+http://www.chatbotscommunity.com/edhack-chatbots-and-ai-hackathons-cup-2016-misis/
