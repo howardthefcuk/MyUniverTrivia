@@ -1,6 +1,6 @@
 # Daily Trivia Bot - Team Five Lakes - Chatbots Community: Eduhack 
 
-Winner: Enjoyme spicial nomination
+Winner: Enjoyme special nomination
 
 Interface Language: Russian
 Link: https://telegram.me/FiveLakesMyUniverBot
