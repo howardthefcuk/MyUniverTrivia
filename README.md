@@ -9,7 +9,7 @@ Description: Daily Trivia Bot created base on MyUniver educational service (http
 Five Lakes:
 - Oleg Zebnitskiy
 - Vladislav Tushkanov
-- Alber Davonyan
+- Albert Davonyan
 
 Event Website:
 http://www.chatbotscommunity.com/edhack-chatbots-and-ai-hackathons-cup-2016-misis/
