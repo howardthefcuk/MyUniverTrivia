@@ -117,7 +117,7 @@ class buddy:
 @server.route("/")
 def webhook():
     bot.remove_webhook()
-    bot.set_webhook(url="https://herokuProject_url/bot")
+    bot.set_webhook(url="https://infinite-river-17473.herokuapp.com/bot")
     return "!", 200
 
 
