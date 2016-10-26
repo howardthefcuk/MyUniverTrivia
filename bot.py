@@ -113,7 +113,7 @@ class buddy:
 			time.sleep(10)
 
 
-
+'''
 @server.route("/")
 def webhook():
     bot.remove_webhook()
@@ -125,14 +125,11 @@ def webhook():
 def getMessage():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
     return "!", 200
-
+'''
 @bot.message_handler(content_types=["text"])
 def repeat_all_messages(message):
     puppy.lifetime(message)
- 
+
 if __name__ == '__main__':
 	puppy = buddy(bot)
-	threading.Thread(target = server.run(host="0.0.0.0", port=os.environ.get('PORT', 5000))
-).start()
-	threading.Thread(target = puppy.timerAction()).start()
-
+	threading.Thread(target = bot.polling(none_stop=True)).start()
